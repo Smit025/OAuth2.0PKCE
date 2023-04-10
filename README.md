@@ -3,11 +3,13 @@ OAuth 2.0 PKCE (Proof Key for Code Exchange)
 This document explains the purpose and benefits of using OAuth 2.0 PKCE (Proof Key for Code Exchange) in your application's authentication flow.
 
 Table of Contents
-Introduction
-OAuth 2.0 Flows
-Why OAuth 2.0 PKCE
-How PKCE Works
-Conclusion
+1.Introduction
+2.OAuth 2.0 Flows
+3.Why OAuth 2.0 PKCE
+4.How PKCE Works
+5.Conclusion
+
+
 Introduction
 OAuth 2.0 is an industry-standard authorization protocol that allows third-party applications to access users' resources on other platforms (like Google, Facebook, etc.) without sharing their credentials. It provides a secure and reliable way for applications to request and obtain limited access to users' resources without exposing their credentials.
 
