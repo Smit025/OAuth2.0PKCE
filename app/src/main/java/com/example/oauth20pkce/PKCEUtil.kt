@@ -1,24 +1,20 @@
 package com.example.oauth20pkce
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.util.Base64
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
-import java.util.Base64
 
 object PKCEUtil {
     private const val CODE_VERIFIER_LENGTH = 64
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun generateRandomCodeVerifier(): String {
         val secureRandom = SecureRandom()
         val codeVerifier = ByteArray(CODE_VERIFIER_LENGTH)
         secureRandom.nextBytes(codeVerifier)
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(codeVerifier)
+        return Base64.encodeToString(codeVerifier, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createCodeChallenge(codeVerifier: String): String {
         val bytes = codeVerifier.toByteArray(Charsets.UTF_8)
         val messageDigest = try {
@@ -27,10 +23,9 @@ object PKCEUtil {
             throw IllegalStateException("SHA-256 algorithm not found", e)
         }
         val hashedBytes = messageDigest.digest(bytes)
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(hashedBytes)
+        return Base64.encodeToString(hashedBytes, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun generatePKCEData(): PKCEData {
         val codeVerifier = generateRandomCodeVerifier()
         val codeChallenge = createCodeChallenge(codeVerifier)
@@ -44,3 +39,4 @@ object PKCEUtil {
         val codeChallengeMethod: String
     )
 }
+
