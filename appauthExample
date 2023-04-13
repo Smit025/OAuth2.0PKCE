@@ -1,57 +1,45 @@
-import android.content.Intent
-import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import androidx.browser.customtabs.CustomTabsIntent
-import net.openid.appauth.*
-import PKCEUtil.PKCEData
+class CustomAuthorizationService(
+    private val configuration: CustomAuthorizationServiceConfiguration,
+    private val httpClient: HttpClient
+) {
 
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var authService: AuthorizationService
-
-    private val authRequestLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val data = result.data
-        val response = AuthorizationResponse.fromIntent(data!!)
-        val error = AuthorizationException.fromIntent(data)
-
-        // Handle the response and error accordingly
+    suspend fun authorize(request: CustomAuthorizationRequest): CustomAuthorizationResponse {
+        // Implement your custom authorization logic here.
+        // For example, you can use the httpClient to send a request to the authorization server.
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    // Add any other custom methods required for your authorization service.
+}
+class CustomAuthorizationServiceConfiguration(
+    val issuer: String,
+    val authorizationEndpoint: String,
+    val tokenEndpoint: String
+) {
 
-        authService = AuthorizationService(this)
-
-        val pkceData: PKCEData = PKCEUtil.generatePKCEData()
-        startAuthFlow(pkceData)
+    companion object {
+        fun fromJson(json: String): CustomAuthorizationServiceConfiguration {
+            val jsonObject = JSONObject(json)
+            return CustomAuthorizationServiceConfiguration(
+                issuer = jsonObject.getString("issuer"),
+                authorizationEndpoint = jsonObject.getString("authorizationEndpoint"),
+                tokenEndpoint = jsonObject.getString("tokenEndpoint")
+            )
+        }
     }
 
-    private fun startAuthFlow(pkceData: PKCEData) {
-        val config: AuthorizationServiceConfiguration = createAuthConfig()
+    // Add any other custom configuration properties required for your authorization service.
+}
+class CustomAuthorizationRequest(
+    val clientId: String,
+    val responseType: String,
+    val redirectUri: String,
+    val scope: String,
+    val state: String?,
+    val nonce: String?,
+    val codeChallenge: String?,
+    val codeChallengeMethod: String?,
+    val additionalParameters: Map<String, String>?
+) {
 
-        val authRequest = AuthorizationRequest.Builder(
-            config,
-            getString(R.string.client_id),
-            ResponseTypeValues.CODE,
-            Uri.parse(getString(R.string.redirect_uri))
-        ).apply {
-            setScopes("openid", "email", "profile")
-            setCodeVerifier(pkceData.codeVerifier, pkceData.codeChallenge, pkceData.codeChallengeMethod)
-        }.build()
-
-        val customTabsIntentBuilder = authService.createCustomTabsIntentBuilder(authRequest.toUri())
-        val customTabsIntent = customTabsIntentBuilder.build()
-
-        val intent = authService.getAuthorizationRequestIntent(authRequest, customTabsIntent)
-        authRequestLauncher.launch(intent)
-    }
-
-    private fun createAuthConfig(): AuthorizationServiceConfiguration {
-        val authEndpoint = Uri.parse(getString(R.string.authorization_endpoint_uri))
-        val tokenEndpoint = Uri.parse(getString(R.string.token_endpoint_uri))
-        return AuthorizationServiceConfiguration(authEndpoint, tokenEndpoint)
-    }
+    // Add any other custom properties or methods required for your authorization request.
 }
