@@ -89,4 +89,35 @@ class CustomAuthorizationRequest(
         service
 
 
+fun generateAuthUrl(authRequest: CustomAuthorizationRequest): String {
+    val baseUrl = authRequest.serviceConfig.authorizationEndpoint.toString()
+    val clientId = URLEncoder.encode(authRequest.clientId, "UTF-8")
+    val responseType = authRequest.responseType.toString()
+    val redirectUri = URLEncoder.encode(authRequest.redirectUri.toString(), "UTF-8")
+    val scope = URLEncoder.encode(authRequest.scope, "UTF-8")
 
+    val additionalParams = authRequest.additionalParameters.map { (key, value) ->
+        "${URLEncoder.encode(key, "UTF-8")}=${URLEncoder.encode(value, "UTF-8")}"
+    }.joinToString("&")
+
+    val authUrlBuilder = StringBuilder("$baseUrl?client_id=$clientId&response_type=$responseType&redirect_uri=$redirectUri&scope=$scope")
+
+    if (authRequest.state != null) {
+        authUrlBuilder.append("&state=${URLEncoder.encode(authRequest.state, "UTF-8")}")
+    }
+
+    if (authRequest.nonce != null) {
+        authUrlBuilder.append("&nonce=${URLEncoder.encode(authRequest.nonce, "UTF-8")}")
+    }
+
+    if (authRequest.codeChallenge != null) {
+        authUrlBuilder.append("&code_challenge=${URLEncoder.encode(authRequest.codeChallenge, "UTF-8")}")
+        authUrlBuilder.append("&code_challenge_method=${URLEncoder.encode(authRequest.codeChallengeMethod, "UTF-8")}")
+    }
+
+    if (additionalParams.isNotEmpty()) {
+        authUrlBuilder.append("&$additionalParams")
+    }
+
+    return authUrlBuilder.toString()
+}
