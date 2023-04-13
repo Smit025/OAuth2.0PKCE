@@ -41,5 +41,52 @@ class CustomAuthorizationRequest(
     val additionalParameters: Map<String, String>?
 ) {
 
-    // Add any other custom properties or methods required for your authorization request.
-}
+      class Builder(
+            private val serviceConfig: CustomAuthorizationServiceConfiguration,
+            private val clientId: String,
+            private val responseType: String,
+            private val redirectUri: String
+        ) {
+            // Builder properties
+            private var scope: String? = null
+            private var state: String? = null
+            private var nonce: String? = null
+            private var codeChallenge: String? = null
+            private var codeChallengeMethod: String? = null
+            private var additionalParameters: MutableMap<String, String> = mutableMapOf()
+
+            // Builder methods
+            fun setScope(scope: String) = apply { this.scope = scope }
+            fun setState(state: String?) = apply { this.state = state }
+            fun setNonce(nonce: String?) = apply { this.nonce = nonce }
+            fun setCodeChallenge(codeChallenge: String, codeChallengeMethod: String) = apply {
+                this.codeChallenge = codeChallenge
+                this.codeChallengeMethod = codeChallengeMethod
+            }
+            fun setAdditionalParameters(additionalParameters: Map<String, String>) = apply {
+                this.additionalParameters.putAll(additionalParameters)
+            }
+
+            fun build(): CustomAuthorizationRequest {
+                return CustomAuthorizationRequest(
+                    clientId,
+                    responseType,
+                    redirectUri,
+                    scope ?: "",
+                    state,
+                    nonce,
+                    codeChallenge,
+                    codeChallengeMethod,
+                    additionalParameters
+                )
+            }
+        }
+    }
+    Update the createAuthRequest function to use the new CustomAuthorizationRequest.Builder:
+    kotlin
+    Copy code
+    private suspend fun createAuthRequest(
+        service
+
+
+
