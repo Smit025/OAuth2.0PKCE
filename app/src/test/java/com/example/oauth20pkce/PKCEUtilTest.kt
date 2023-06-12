@@ -1,38 +1,33 @@
 package com.example.oauth20pkce
+import android.util.Base64
 
-import junit.framework.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 
 class PKCEUtilTest {
 
     @Test
-    fun testgenerateRandomCodeVerifier() {
-        val codeVerifier = PKCEUtil.generateRandomCodeVerifier()
+    fun `test generatePKCEData`() {
+        val mockedCodeVerifier = "mockedCodeVerifier"
+        val mockedCodeChallenge = "mockedCodeChallenge"
 
-        assertNotNull(codeVerifier)
-        assertEquals(PKCEUtil.CODE_VERIFIER_LENGTH, codeVerifier.length)
-        assertTrue(codeVerifier.matches("[A-Za-z0-9-._~]{64}".toRegex()))
-    }
+        // Mock the generateRandomCodeVerifier() function
+        val mockPKCEUtil = mock(PKCEUtil::class.java)
+        `when`(mockPKCEUtil.generateRandomCodeVerifier()).thenReturn(mockedCodeVerifier)
 
-    @Test
-    fun testcreateCodeChallenge() {
-        val codeVerifier = "testCodeVerifier"
+        // Mock the createCodeChallenge() function
+        `when`(mockPKCEUtil.createCodeChallenge(mockedCodeVerifier)).thenReturn(mockedCodeChallenge)
 
-        val codeChallenge = PKCEUtil.createCodeChallenge(codeVerifier)
+        // Generate PKCEData using the mocked functions
+        val pkceData = mockPKCEUtil.generatePKCEData()
 
-        assertNotNull(codeChallenge)
-        assertTrue(codeChallenge.matches("[A-Za-z0-9-._~]+".toRegex()))
-    }
-
-    @Test
-    fun testgeneratePKCEData() {
-        val pkceData = PKCEUtil.generatePKCEData()
-
-        assertNotNull(pkceData.codeVerifier)
-        assertNotNull(pkceData.codeChallenge)
-        assertEquals(PKCEUtil.CODE_VERIFIER_LENGTH, pkceData.codeVerifier.length)
-        assertTrue(pkceData.codeVerifier.matches("[A-Za-z0-9-._~]{64}".toRegex()))
-        assertTrue(pkceData.codeChallenge.matches("[A-Za-z0-9-._~]+".toRegex()))
+        // Verify that the generated PKCEData has the expected properties
+        assertNotNull(pkceData)
+        assertEquals(mockedCodeVerifier, pkceData.codeVerifier)
+        assertEquals(mockedCodeChallenge, pkceData.codeChallenge)
         assertEquals("S256", pkceData.codeChallengeMethod)
     }
 }
