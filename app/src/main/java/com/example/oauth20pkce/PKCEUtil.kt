@@ -6,16 +6,16 @@ import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 
 object PKCEUtil {
-    private const val CODE_VERIFIER_LENGTH = 64
+    const val CODE_VERIFIER_LENGTH = 64
 
-    private fun generateRandomCodeVerifier(): String {
+    fun generateRandomCodeVerifier(): String {
         val secureRandom = SecureRandom()
         val codeVerifier = ByteArray(CODE_VERIFIER_LENGTH)
         secureRandom.nextBytes(codeVerifier)
         return Base64.encodeToString(codeVerifier, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }
 
-    private fun createCodeChallenge(codeVerifier: String): String {
+    fun createCodeChallenge(codeVerifier: String): String {
         val bytes = codeVerifier.toByteArray(Charsets.UTF_8)
         val messageDigest = try {
             MessageDigest.getInstance("SHA-256")
